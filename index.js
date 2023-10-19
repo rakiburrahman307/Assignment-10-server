@@ -50,6 +50,26 @@ async function run() {
     })
 
 
+    app.put('/allProducts/:id', async(req, res)=>{
+      const id = req.params.id;
+      const data = req.body;
+      const query = { _id: new ObjectId(id) };
+      const updateDoc = {
+        $set: {
+          name:data.name,
+          brand:data.brand,
+          price:data.price,
+          description:data.description,
+          imageUrl:data.imageUrl,
+          rating:data.rating
+          
+        }
+      };
+      const result = await productCollections.updateOne(query, updateDoc);
+      res.send(result);
+    })
+
+
 
 
 
