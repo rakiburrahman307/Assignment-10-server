@@ -1,7 +1,7 @@
 const express = require('express');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config()
-const cors =require('cors');
+const cors = require('cors');
 const app = express();
 const port = process.env.PORT || 5000;
 
@@ -31,48 +31,49 @@ async function run() {
 
     const productCollections = client.db('allProduct').collection('products');
     const myCartCollections = client.db('allProduct').collection('myCart');
+    const feedbackCollections = client.db('allProduct').collection('feedbacks');
 
-    app.post('/allProducts', async(req, res) => {
-      const newProduct =req.body;
+    app.post('/allProducts', async (req, res) => {
+      const newProduct = req.body;
       const result = await productCollections.insertOne(newProduct)
       res.send(result);
-    })
+    });
     app.get('/allProducts', async (req, res) => {
       const cursor = productCollections.find();
       const result = await cursor.toArray();
       res.send(result);
-  })
-    app.get('/allProducts/:id', async(req, res) => {
+    });
+    app.get('/allProducts/:id', async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await productCollections.findOne(query);
       res.send(result);
-    })
+    });
 
 
-    app.put('/allProducts/:id', async(req, res)=>{
+    app.put('/allProducts/:id', async (req, res) => {
       const id = req.params.id;
       const data = req.body;
       const query = { _id: new ObjectId(id) };
       const updateDoc = {
         $set: {
-          name:data.name,
-          brand:data.brand,
-          price:data.price,
-          description:data.description,
-          imageUrl:data.imageUrl,
-          rating:data.rating
-          
+          name: data.name,
+          brand: data.brand,
+          price: data.price,
+          description: data.description,
+          imageUrl: data.imageUrl,
+          rating: data.rating
+
         }
       };
       const result = await productCollections.updateOne(query, updateDoc);
       res.send(result);
-    })
+    });
 
 
-      // Add Cart \\
+    // Add Cart apis
 
-    app.post('/myCart', async(req, res) => {
+    app.post('/myCart', async (req, res) => {
       const newCart = req.body;
       const result = await myCartCollections.insertOne(newCart);
       res.send(result);
@@ -89,7 +90,27 @@ async function run() {
       const query = { _id: new ObjectId(id) };
       const result = await myCartCollections.deleteOne(query);
       res.send(result);
-    }); 
+    });
+
+    // Feedback apis 
+
+    app.get('/feedback', async (req, res) => {
+      const cursor = feedbackCollections.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    app.post('/feedback', async (req, res) => {
+      const newFeedback = req.body;
+      const result = await feedbackCollections.insertOne(newFeedback);
+      res.send(result);
+    });
+    app.delete('/feedback/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await feedbackCollections.deleteOne(query);
+      res.send(result);
+    });
 
 
 
@@ -103,12 +124,9 @@ async function run() {
 }
 run().catch(console.dir);
 
-
-
-
-app.get('/', (req, res)=>{
-    res.send("hello world")
+app.get('/', (req, res) => {
+  res.send("hello world")
 });
-app.listen(port, ()=>{
-    console.log(`server is running on Port: ${port}`)
+app.listen(port, () => {
+  console.log(`server is running on Port: ${port}`)
 });
